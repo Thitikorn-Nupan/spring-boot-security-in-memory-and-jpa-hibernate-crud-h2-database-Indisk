@@ -1,0 +1,21 @@
+logging:
+  level:
+    root: info
+spring:
+  main:
+    banner-mode: off
+# h2 ui
+# database
+  h2:
+    console:
+      enabled: true
+  jpa:
+    show-sql: true
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: none
+# B:\h2database\dbsecure
+  datasource:
+    url: jdbc:h2:B:/h2database/dbsecure/users
+    username: ttknp
+    password:
