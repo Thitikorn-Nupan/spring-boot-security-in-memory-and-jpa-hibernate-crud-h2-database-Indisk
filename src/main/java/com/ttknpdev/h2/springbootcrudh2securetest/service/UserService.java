@@ -10,5 +10,4 @@ public interface UserService<T> {
     T read(Long id);
     Map<String,T> update(T obj);
     Map<String,T> delete(Long id);
-
 }

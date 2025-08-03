@@ -12,25 +12,24 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class ConfigSecure {
     @Bean
-    public InMemoryUserDetailsManager userDetailsManager() {
-        /* method for create roles (in memory) */
+    public InMemoryUserDetailsManager userDetailsManager() { // method for create user & roles (in memory)
         UserDetails mrAAA = User
-                .withUsername("mr.aaa")
+                .withUsername("mr.a")
                 .password("{noop}12345")
                 .roles("NORMAL")
                 .build();
         UserDetails mrBBB = User
-                .withUsername("mr.bbb")
+                .withUsername("mr.b")
                 .password("{noop}12345")
                 .roles("EMPLOYEE","NORMAL")
                 .build();
         UserDetails mrCCC = User
-                .withUsername("mr.ccc")
+                .withUsername("mr.c")
                 .password("{noop}12345")
                 .roles("ADMIN")
                 .build();
         UserDetails mrDDD = User
-                .withUsername("mr.ddd")
+                .withUsername("mr.d")
                 .password("{noop}12345")
                 .roles("ADMIN","NORMAL","EMPLOYEE")
                 .build();
@@ -38,25 +37,24 @@ public class ConfigSecure {
     }
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        /* create accessing of roles */
+        // create accessing of roles
         httpSecurity
-
                 .authorizeHttpRequests()
-                .requestMatchers("/api/indisk/reads").hasAnyRole("EMPLOYEE","ADMIN")
-                .requestMatchers("/api/indisk/read/**").hasAnyRole("EMPLOYEE","NORMAL")
-                .and()
-                .authorizeHttpRequests()
-                .requestMatchers(HttpMethod.POST,"/api/indisk/create").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.POST,"/api/indisk/creates").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE,"/api/indisk/delete/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT,"/api/indisk/update").hasRole("ADMIN")
+                .requestMatchers("/api/user/reads").hasAnyRole("EMPLOYEE","ADMIN")
+                .requestMatchers("/api/user/read/**").hasAnyRole("EMPLOYEE","NORMAL")
+                // .and().authorizeHttpRequests()
+                .requestMatchers(HttpMethod.POST,"/api/user/create").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST,"/api/user/creates").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE,"/api/user/delete/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT,"/api/user/update").hasRole("ADMIN")
                 .anyRequest().authenticated();
-
         httpSecurity.httpBasic();
         httpSecurity.csrf().disable();
-        httpSecurity.headers().frameOptions().disable(); /* when need to use console h2 specify this line it works
-        , because i try to access with user / pass on my memory it can into login page but page doesn't load */
-
+        /*
+        when need to use console h2 specify this httpSecurity.headers().frameOptions().disable(); it'll work
+        cause : i try to access with user / pass on my memory it can into login page but page doesn't load
+        */
+        httpSecurity.headers().frameOptions().disable();
         return httpSecurity.build();
     }
 }

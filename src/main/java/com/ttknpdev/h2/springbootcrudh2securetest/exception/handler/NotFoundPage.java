@@ -1,7 +1,8 @@
 package com.ttknpdev.h2.springbootcrudh2securetest.exception.handler;
 
 public class NotFoundPage extends RuntimeException {
-    private String causeCurrent;
+    private final String causeCurrent;
+
     public NotFoundPage(String causeCurrent) {
         super(causeCurrent);
         this.causeCurrent = causeCurrent;

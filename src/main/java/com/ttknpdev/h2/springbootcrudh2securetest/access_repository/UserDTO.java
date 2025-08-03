@@ -1,26 +1,22 @@
 package com.ttknpdev.h2.springbootcrudh2securetest.access_repository;
 
-
 import com.ttknpdev.h2.springbootcrudh2securetest.entity.UserDetails;
 import com.ttknpdev.h2.springbootcrudh2securetest.exception.handler.NotAllowedMethod;
 import com.ttknpdev.h2.springbootcrudh2securetest.exception.handler.NotFoundPage;
-import com.ttknpdev.h2.springbootcrudh2securetest.repository.UserRepositories;
+import com.ttknpdev.h2.springbootcrudh2securetest.repository.UserRepository;
 import com.ttknpdev.h2.springbootcrudh2securetest.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
-public class AccessRepositories implements UserService<UserDetails> {
+public class UserDTO implements UserService<UserDetails> {
     
-    private UserRepositories repositories;
+    private final UserRepository userRepository;
+
     @Autowired
-    public AccessRepositories(UserRepositories repositories) {
-        this.repositories = repositories;
+    public UserDTO(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
     
     private UserDetails validateBeforeQuery(UserDetails userDetails) {
@@ -38,10 +34,10 @@ public class AccessRepositories implements UserService<UserDetails> {
     public UserDetails create(UserDetails obj) {
         UserDetails newUser = null;
         if (validateBeforeQuery(obj).getId() != null) {
-            newUser = repositories.save(obj);
+            newUser = userRepository.save(obj);
         }
         else {
-            throw new NotAllowedMethod("maybe , some fields it was null");
+            throw new NotAllowedMethod("found some fields it's null");
         }
         return newUser;
     }
@@ -49,34 +45,31 @@ public class AccessRepositories implements UserService<UserDetails> {
     @Override
     public List<UserDetails> creates(List<UserDetails> listObj) {
         List<UserDetails> userDetailsListNew = new ArrayList<>();
-        if (listObj.size() > 0) {
-            for (int i = 0 ; i<= listObj.size()-1 ; i++) {
-
+        if (!listObj.isEmpty()) {
+            for (int i = 0 ; i <= (listObj.size()-1) ; i++) {
                 if (validateBeforeQuery(listObj.get(i)).getId() != null) {
                     userDetailsListNew.add(listObj.get(i));
                 }
                 else {
-
-                    throw new NotAllowedMethod("found some fields it was null");
-                    /* break; it means leave method (No clear any order)*/
+                    throw new NotAllowedMethod("found some fields it's null");
+                    // break; it means leave method (No clear any order)
                 }
-
             }
-
-            userDetailsListNew = repositories.saveAll(userDetailsListNew);
+            userDetailsListNew = userRepository.saveAll(userDetailsListNew);
         }
         return userDetailsListNew;
     }
 
     @Override
     public List<UserDetails> reads() {
-        return (List<UserDetails>) repositories.findAll();
+        return userRepository.findAll();
     }
 
     @Override
     public UserDetails read(Long id) {
-        UserDetails found = new UserDetails();
-        repositories.findById(id)
+        /*
+        // UserDetails found = new UserDetails();
+        userRepository.findById(id)
                 .ifPresent(user-> {
                     found.setId(user.getId());
                     found.setCity(user.getCity());
@@ -84,27 +77,27 @@ public class AccessRepositories implements UserService<UserDetails> {
                     found.setHeight(user.getHeight());
                     found.setFullname(user.getFullname());
                 });
-        return found;
+        */
+        return userRepository.findById(id).orElse(null);
     }
 
     @Override
     public Map<String, UserDetails> update(UserDetails obj) {
         Map<String,UserDetails> response = new HashMap<>();
-        if (repositories.findById(obj.getId()).isPresent()) {
-
-            repositories.findById(obj.getId())
-                    .ifPresent((user) -> {
+        Optional<UserDetails> userDetails = userRepository.findById(obj.getId());
+        if (userDetails.isPresent()) { // if exist
+            userDetails.ifPresent((user) -> {
                         user.setId(obj.getId());
                         user.setCity(obj.getCity());
                         user.setWeight(obj.getWeight());
                         user.setHeight(obj.getHeight());
                         user.setFullname(obj.getFullname());
-                        repositories.save(user);
+                        userRepository.save(user);
                         response.put("updated",user);
                     });
         }
         else {
-            throw new NotFoundPage("maybe , id isn't correct");
+            throw new NotFoundPage("The primary key isn't existed");
         }
         return response;
     }
@@ -112,11 +105,15 @@ public class AccessRepositories implements UserService<UserDetails> {
     @Override
     public Map<String, UserDetails> delete(Long id) {
         Map<String,UserDetails> response = new HashMap<>();
-        repositories.findById(id)
-                .ifPresent(user-> {
-                    repositories.delete(user);
-                    response.put("deleted",user);
-                });
+        Optional<UserDetails> userDetails = userRepository.findById(id);
+        if (userDetails.isPresent()) {  // if exist
+            userDetails.ifPresent(user-> {
+                        userRepository.delete(user);
+                        response.put("deleted",user);
+                    });
+        } else {
+            throw new NotFoundPage("The primary key isn't existed");
+        }
         return response;
     }
 }

@@ -1,6 +1,8 @@
 logging:
   level:
-    root: info
+    root[0]: info
+    root[1]: debug
+    root[2]: warn
 spring:
   main:
     banner-mode: off
@@ -13,9 +15,12 @@ spring:
     show-sql: true
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: none
-# B:\h2database\dbsecure
+# ***** When you set h2 in mem you should set ddl-auto: create-drop
+# So now you can test and no need initial schema
+      ddl-auto: create-drop
+# Set url on memory
+# ***** Note when you run you have to initial all sql scripts again!!!!
   datasource:
-    url: jdbc:h2:B:/h2database/dbsecure/users
+    url: jdbc:h2:mem:test_database
     username: ttknp
     password:

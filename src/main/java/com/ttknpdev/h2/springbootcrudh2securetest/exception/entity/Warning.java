@@ -10,7 +10,7 @@ public class Warning {
     private Short status;
     private String message;
     private String cause;
-    @Setter(AccessLevel.PRIVATE)
+    @Setter(AccessLevel.PRIVATE) // specify setter as private
     private String date;
 
     public Warning(Short status,String message, String cause) {

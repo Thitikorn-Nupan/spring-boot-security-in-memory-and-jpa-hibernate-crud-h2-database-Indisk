@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <!-- color good for console but it's not in file -->
+            <pattern>%d{dd-MM-yyyy HH:mm:ss.SSS} %highlight(%-5level) [%blue(%t)] %green(%logger{45}) %line : %msg%n%throwable</pattern>        </encoder>
+    </appender>
+
+    <!-- fix Please use "level" attribute within <logger> or <root> elements instead. -->
+    <root value="INFO,DEBUG" >
+        <!--
+            2 config for logging level by logback
+            1 . application.properties
+            2 . <level value="<Level>,..." />
+            don't forget specify more level if you want
+        -->
+        <appender-ref ref="consoleAppender" />
+    </root>
+</configuration>
